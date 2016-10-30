@@ -19,16 +19,9 @@ array row2_data = ({
 	({"row9", "item 123", 120, 121.73}),
 });
 
-#if 0
-static const GtkTargetEntry drag_targets = { 
-	"STRING", GTK_TARGET_SAME_APP,TARGET_STRING
-};
-
-static guint n_targets = 1;
-
-/* Could be used instead, if GtkTargetEntry had more than one row */
-//static guint n_targets = G_N_ELEMENTS (drag_targets);
-#endif
+constant drag_targets = ({
+	({"STRING", GTK2.TARGET_SAME_APP, 0}),
+});
 
 /* Convenience function to print out the contents of a DATA struct onto stdout */
 void print_DATA(array data){
@@ -40,10 +33,10 @@ void print_DATA(array data){
 }
 
 /* User callback for "get"ing the data out of the row that was DnD'd */
-#if 0
-void on_drag_data_get(	GtkWidget *widget, GdkDragContext *drag_context,
+void on_drag_data_get(object self, /*GdkDragContext *drag_context,
 			GtkSelectionData *sdata, guint info, guint time,
-			gpointer user_data){
+			gpointer user_data*/mixed ... args){
+	#if 0
 	GtkTreeIter iter;
 	GtkTreeModel *list_store;
 	GtkTreeSelection *selector;
@@ -101,9 +94,12 @@ void on_drag_data_get(	GtkWidget *widget, GdkDragContext *drag_context,
 			
 	/* Just print out what we sent for debugging purposes */
 	print_DATA(temp);
+	#endif
+	write("%O\n", args);
 }
 
 /* User callback for putting the data into the other treeview */
+#if 0
 void on_drag_data_received(GtkWidget *widget, GdkDragContext *drag_context,
 			gint x, gint y, GtkSelectionData *sdata, guint info,
 			guint time, gpointer user_data){
@@ -208,14 +204,9 @@ int main(int argc, array(string) argv){
 		->set_default_size(666,266)->show_all();
 	window->signal_connect("destroy", lambda() {exit(0);});
 
-	#if 0
-	/* Set treeview 1 as the source of the Drag-N-Drop operation */
-	gtk_drag_source_set(view1,GDK_BUTTON1_MASK, &drag_targets,n_targets,
-		GDK_ACTION_COPY|GDK_ACTION_MOVE);
-	/* Attach a "drag-data-get" signal to send out the dragged data */
-	g_signal_connect(view1,"drag-data-get",
-		G_CALLBACK(on_drag_data_get),NULL);
-	#endif
+	view1->drag_source_set(GTK2.GDK_BUTTON1_MASK, drag_targets,
+		GTK2.GDK_ACTION_COPY|GTK2.GDK_ACTION_MOVE);
+	view1->signal_connect("drag-data-get", on_drag_data_get);
 
 	#if 0
 	/* Set treeview 2 as the destination of the Drag-N-Drop operation */
