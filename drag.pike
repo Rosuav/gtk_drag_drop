@@ -169,15 +169,8 @@ void on_drag_data_received(GtkWidget *widget, GdkDragContext *drag_context,
 
 /* User callback just to see which row was selected, doesnt affect DnD. 
    However it might be important to note that this signal and drag-data-received may occur at the same time. If you drag a row out of one view, your selection changes too */
-#if 0
-void on_selection_changed (GtkTreeSelection *treeselection,gpointer user_data){
-	GtkTreeIter iter;
-	GtkTreeModel *list_store;
-	gboolean rv;
-	printf("on_selection_changed: ");
-
-	rv = gtk_tree_selection_get_selected(treeselection,
-		&list_store,&iter);
+void on_selection_changed(object self) {
+	#if 0
 	/* "changed" signal sometimes fires blanks, so make sure we actually 
 	 have a selection/
 http://library.gnome.org/devel/gtk/stable/GtkTreeSelection.html#GtkTreeSelection-changed */
@@ -185,23 +178,11 @@ http://library.gnome.org/devel/gtk/stable/GtkTreeSelection.html#GtkTreeSelection
 		printf("No row selected\n");
 		return;
 	}
-	
-	GValue value={0,};
-	char *cptr;
-	int i;
-
-	/* Walk throw the columns to see the row data */
-	for(i=0;i<NUM_COLS;i++){
-		gtk_tree_model_get_value(list_store,&iter,i,&value);
-		cptr = (gchar *) g_strdup_value_contents (&value);
-		g_value_unset(&value);
-		if(cptr)printf("%s|",cptr);
-		free(cptr);
-	}
-	printf("\n");
-
+	#endif
+	[GTK2.TreeIter iter, GTK2.TreeModel list_store] = self->get_selected();
+	write("on_selection_changed: ");
+	print_DATA(list_store->get_row(iter));
 }
-#endif
 
 /* Create and populate a treeview */
 GTK2.TreeView create_treeview(array data) {
@@ -228,11 +209,7 @@ GTK2.TreeView create_treeview(array data) {
 	}
 	
 	/* Attach the "changed" callback onto the tree's selector */
-	#if 0
-	g_signal_connect(
-		gtk_tree_view_get_selection (GTK_TREE_VIEW(tree_view)),
-		"changed",G_CALLBACK(on_selection_changed),NULL);
-	#endif
+	tree_view->get_selection()->signal_connect("changed", on_selection_changed);
 	return tree_view;
 }
 
