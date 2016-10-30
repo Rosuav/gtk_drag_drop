@@ -203,21 +203,14 @@ http://library.gnome.org/devel/gtk/stable/GtkTreeSelection.html#GtkTreeSelection
 }
 #endif
 
-/* Creates a scroll windows,  puts a treeview in it and populates it */
-GTK2.Widget add_treeview(GTK2.Box box, array data){
-	GTK2.Widget swindow = GTK2.ScrolledWindow()->set_policy(GTK2.POLICY_AUTOMATIC, GTK2.POLICY_AUTOMATIC);
-	/* Add this window to the box */
-	box->pack_start(swindow, 1, 1, 2);
-
+/* Create and populate a treeview */
+GTK2.TreeView create_treeview(array data) {
 	/* Create the treeview and its list store */
 	GTK2.ListStore list_store = GTK2.ListStore(
 		({"string", "string", "int", "float"}));
 
 	GTK2.Widget tree_view = GTK2.TreeView(list_store);
 
-	/* Add the treeview to the scrolled window */
-	swindow->add(tree_view);
-		
 	/* Add the columns */
 	foreach (({"Row #", "Description", "Qty", "Price"}); int i; string hdr) {
 		tree_view->append_column(GTK2.TreeViewColumn(hdr,
@@ -247,17 +240,21 @@ int main(int argc, array(string) argv){
 	GTK2.setup_gtk(argv);
 
 	/* Create the top level window and setup the quit callback */
-	GTK2.Hbox hbox;
+	GTK2.TreeView view1, view2;
 	GTK2.Window window = GTK2.Window(GTK.WINDOW_TOPLEVEL)
 		->add(GTK2.Vbox(0, 10)
 			->pack_start(GTK2.Label(DESCRIPTION), 0, 0, 1)
-			->pack_start(hbox = GTK2.Hbox(1, 1), 1, 1, 1)
+			->pack_start(GTK2.Hbox(1, 1)
+				->pack_start(GTK2.ScrolledWindow()->set_policy(GTK2.POLICY_AUTOMATIC, GTK2.POLICY_AUTOMATIC)
+					->add(view1 = create_treeview(row_data))
+				, 1, 1, 2)
+				->pack_start(GTK2.ScrolledWindow()->set_policy(GTK2.POLICY_AUTOMATIC, GTK2.POLICY_AUTOMATIC)
+					->add(view2 = create_treeview(row2_data))
+				, 1, 1, 2)
+			, 1, 1, 1)
 		)
-		->set_default_size(666,266);
+		->set_default_size(666,266)->show_all();
 	window->signal_connect("destroy", lambda() {exit(0);});
-
-	/* Create treeview 1 */
-	GTK2.Widget view1 = add_treeview(hbox,row_data);
 
 	#if 0
 	/* Set treeview 1 as the source of the Drag-N-Drop operation */
@@ -267,9 +264,6 @@ int main(int argc, array(string) argv){
 	g_signal_connect(view1,"drag-data-get",
 		G_CALLBACK(on_drag_data_get),NULL);
 	#endif
-
-	/* Create treeview 2 */
-	GTK2.Widget view2 = add_treeview(hbox,row2_data);
 
 	#if 0
 	/* Set treeview 2 as the destination of the Drag-N-Drop operation */
@@ -281,6 +275,5 @@ int main(int argc, array(string) argv){
 	#endif
 
 	/* Rock'n Roll */
-	window->show_all();
 	return -1;
 }
