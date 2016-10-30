@@ -1,29 +1,4 @@
 constant DESCRIPTION = "Drag and Drop Between 2 Treeviews - by Vikram Ambrose";
-#if 0
-/* Row data structure */
-struct DATA { 
-	char *row;
-	char *item;
-	int qty;
-	float price;
-};
-
-/* A convenience enumerator to tag data types */
-enum {
-	TARGET_STRING,
-	TARGET_INTEGER,
-	TARGET_FLOAT
-};
-	
-/* A convenience enumerator to count the columns */
-enum {
-	ROW_COL=0,
-	ITEM_COL,
-	QTY_COL,
-	PRICE_COL,
-	NUM_COLS
-};
-#endif
 
 /* Some sample data for treeview 1. A NULL row is added so we dont 
    need to pass around the size of the array */
