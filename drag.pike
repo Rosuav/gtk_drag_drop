@@ -33,58 +33,16 @@ void print_DATA(array data){
 }
 
 /* User callback for "get"ing the data out of the row that was DnD'd */
-void on_drag_data_get(object self, /*GdkDragContext *drag_context,
-			GtkSelectionData *sdata, guint info, guint time,
-			gpointer user_data*/mixed ... args){
-	#if 0
-	GtkTreeIter iter;
-	GtkTreeModel *list_store;
-	GtkTreeSelection *selector;
-	gboolean rv;
-	printf("on_drag_data_get: ");
+mixed on_drag_data_get(object self, mixed drag_context,
+			GTK2.SelectionData sdata, int info, int time) {
+	write("on_drag_data_get: %O ", sdata);
 
 	/* Get the selector widget from the treeview in question */
-	selector = gtk_tree_view_get_selection(GTK_TREE_VIEW(widget));
-
 	/* Get the tree model (list_store) and initialise the iterator */
-	rv = gtk_tree_selection_get_selected(selector,&list_store,&iter);
+	[GTK2.TreeIter iter, GTK2.TreeModel list_store] = self->get_selection()->get_selected();
+	array temp = list_store->get_row(iter);
 
-	/* This shouldn't really happen, but just in case */
-	if(rv==FALSE){
-		printf(" No row selected\n");
-		return;
-	}
-
-	/* Always initialise a GValue with 0 */
-	GValue value={0,};
-	char *cptr;
-
-	/* Allocate a new row to send off to the other side */
-	struct DATA *temp = malloc(sizeof(struct DATA));
-
-	/* Go through the columns */
-	
-	/* Get the GValue of a particular column from the row, the iterator currently points to*/
-	gtk_tree_model_get_value(list_store,&iter,ROW_COL,&value);
-	cptr = (char*) g_value_get_string(&value);
-	temp->row = malloc(strlen(cptr)*sizeof(char)+1);
-	strcpy(temp->row,cptr);
-	g_value_unset(&value);
-	
-	gtk_tree_model_get_value(list_store,&iter,ITEM_COL,&value);
-	cptr = (char*)g_value_get_string(&value);
-	temp->item = malloc(strlen(cptr)*sizeof(char)+1);
-	strcpy(temp->item,cptr);
-	g_value_unset(&value);
-
-	gtk_tree_model_get_value(list_store,&iter,QTY_COL,&value);
-	temp->qty = g_value_get_int(&value);
-	g_value_unset(&value);
-	
-	gtk_tree_model_get_value(list_store,&iter,PRICE_COL,&value);
-	temp->price = g_value_get_float(&value);
-	g_value_unset(&value);
-	
+	#if 0
 	/* Send the data off into the GtkSelectionData object */
 	gtk_selection_data_set(sdata,
 		gdk_atom_intern ("struct DATA pointer", FALSE),
@@ -93,17 +51,16 @@ void on_drag_data_get(object self, /*GdkDragContext *drag_context,
 		sizeof (temp)); /* The size of the pointer */
 			
 	/* Just print out what we sent for debugging purposes */
-	print_DATA(temp);
 	#endif
-	write("%O\n", args);
+	print_DATA(temp);
 }
 
 /* User callback for putting the data into the other treeview */
-#if 0
-void on_drag_data_received(GtkWidget *widget, GdkDragContext *drag_context,
+void on_drag_data_received(object self, /*GdkDragContext *drag_context,
 			gint x, gint y, GtkSelectionData *sdata, guint info,
-			guint time, gpointer user_data){
-
+			guint time, gpointer user_data*/mixed ... args){
+	write("recv: %O\n", args);
+	#if 0
 	GtkTreeModel *list_store;	
 	GtkTreeIter iter;
 
@@ -135,8 +92,8 @@ void on_drag_data_received(GtkWidget *widget, GdkDragContext *drag_context,
 
 	/* We dont need this anymore */
 	free_DATA(temp);
+	#endif
 }
-#endif
 
 /* User callback just to see which row was selected, doesnt affect DnD. 
    However it might be important to note that this signal and drag-data-received may occur at the same time. If you drag a row out of one view, your selection changes too */
@@ -208,14 +165,11 @@ int main(int argc, array(string) argv){
 		GTK2.GDK_ACTION_COPY|GTK2.GDK_ACTION_MOVE);
 	view1->signal_connect("drag-data-get", on_drag_data_get);
 
-	#if 0
 	/* Set treeview 2 as the destination of the Drag-N-Drop operation */
-	gtk_drag_dest_set(view2,GTK_DEST_DEFAULT_ALL,&drag_targets,n_targets,
-		GDK_ACTION_COPY|GDK_ACTION_MOVE); 
+	view2->drag_dest_set(GTK2.DEST_DEFAULT_ALL,drag_targets,
+		GTK2.GDK_ACTION_COPY|GTK2.GDK_ACTION_MOVE); 
 	/* Attach a "drag-data-received" signal to pull in the dragged data */
-	g_signal_connect(view2,"drag-data-received",
-		G_CALLBACK(on_drag_data_received),view1);
-	#endif
+	view2->signal_connect("drag-data-received", on_drag_data_received, view1);
 
 	/* Rock'n Roll */
 	return -1;
