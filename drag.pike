@@ -35,7 +35,7 @@ void print_DATA(array data){
 /* User callback for "get"ing the data out of the row that was DnD'd */
 mixed on_drag_data_get(object self, mixed drag_context,
 			GTK2.SelectionData sdata, int info, int time) {
-	write("on_drag_data_get: %O ", sdata);
+	write("on_drag_data_get: self %O, dc %O, sd %O\n", self, drag_context, sdata);
 
 	/* Get the selector widget from the treeview in question */
 	/* Get the tree model (list_store) and initialise the iterator */
