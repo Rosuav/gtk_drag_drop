@@ -128,7 +128,7 @@ void on_drag_data_get(	GtkWidget *widget, GdkDragContext *drag_context,
 	gtk_tree_model_get_value(list_store,&iter,PRICE_COL,&value);
 	temp->price = g_value_get_float(&value);
 	g_value_unset(&value);
-	
+	printf("sdata is %p, and %s contain a pointer.\n", sdata, G_VALUE_HOLDS_POINTER(sdata) ? "DOES" : "does NOT");
 	/* Send the data off into the GtkSelectionData object */
 	gtk_selection_data_set(sdata,
 		gdk_atom_intern ("struct DATA pointer", FALSE),
