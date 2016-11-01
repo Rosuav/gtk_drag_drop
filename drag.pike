@@ -58,10 +58,11 @@ mixed on_drag_data_get(object self, mixed drag_context,
 }
 
 /* User callback for putting the data into the other treeview */
-void on_drag_data_received(object self, /*GdkDragContext *drag_context,
-			gint x, gint y, GtkSelectionData *sdata, guint info,
-			guint time, gpointer user_data*/mixed ... args){
-	write("recv: %O\n", args);
+void on_drag_data_received(object self, mixed drag_context,
+			int x, int y, GTK2.SelectionData sdata, int info,
+			int time){
+	write("recv: %O\n", sdata);
+	write("Received hack: %O\n", sdata->get_hack());
 	#if 0
 	GtkTreeModel *list_store;	
 	GtkTreeIter iter;
