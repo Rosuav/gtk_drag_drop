@@ -41,8 +41,8 @@ mixed on_drag_data_get(object self, mixed drag_context,
 	/* Get the tree model (list_store) and initialise the iterator */
 	[GTK2.TreeIter iter, GTK2.TreeModel list_store] = self->get_selection()->get_selected();
 	array temp = list_store->get_row(iter);
-	//sdata->set_text("Testing", -1);
-	sdata->set_hack();
+	sdata->set_text("Testing", -1);
+	//sdata->set_hack();
 
 	#if 0
 	/* Send the data off into the GtkSelectionData object */
@@ -62,7 +62,7 @@ void on_drag_data_received(object self, mixed drag_context,
 			int x, int y, GTK2.SelectionData sdata, int info,
 			int time){
 	write("recv: %O\n", sdata);
-	write("Received hack: %O\n", sdata->get_hack());
+	write("Received text: %O\n", sdata->get_text());
 	#if 0
 	GtkTreeModel *list_store;	
 	GtkTreeIter iter;
