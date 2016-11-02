@@ -41,76 +41,42 @@ mixed on_drag_data_get(object self, mixed drag_context,
 	/* Get the tree model (list_store) and initialise the iterator */
 	[GTK2.TreeIter iter, GTK2.TreeModel list_store] = self->get_selection()->get_selected();
 	array temp = list_store->get_row(iter);
-	sdata->set_text("Testing", -1);
-	//sdata->set_hack();
-
-	#if 0
-	/* Send the data off into the GtkSelectionData object */
-	gtk_selection_data_set(sdata,
-		gdk_atom_intern ("struct DATA pointer", FALSE),
-		8,		/* Tell GTK how to pack the data (bytes) */
-		(void *)&temp,  /* The actual pointer that we just made */
-		sizeof (temp)); /* The size of the pointer */
-			
-	/* Just print out what we sent for debugging purposes */
-	#endif
+	sdata->set_text(Standards.JSON.encode(temp));
 	print_DATA(temp);
 }
 
 /* User callback for putting the data into the other treeview */
 void on_drag_data_received(object self, mixed drag_context,
 			int x, int y, GTK2.SelectionData sdata, int info,
-			int time){
-	write("recv: %O\n", sdata);
-	write("Received text: %O\n", sdata->get_text());
-	#if 0
-	GtkTreeModel *list_store;	
-	GtkTreeIter iter;
-
-	printf("on_drag_data_received:\n");
+			int time, GTK2.TreeView user_data){
+	write("on_drag_data_received:\n");
 
 	/* Remove row from the source treeview */
-	GtkTreeSelection *selector;
-	selector = gtk_tree_view_get_selection(GTK_TREE_VIEW(user_data));
-	gtk_tree_selection_get_selected(selector,&list_store,&iter);
-	gtk_list_store_remove(GTK_LIST_STORE(list_store),&iter);
+	[GTK2.TreeIter iter, GTK2.TreeModel list_store] = user_data->get_selection()->get_selected();
+	list_store->remove(iter);
 
 	/* Now add to the other treeview */
-	GtkTreeModel *list_store2;
-	GtkTreeIter iter2;
-	list_store2 = gtk_tree_view_get_model(GTK_TREE_VIEW(widget));
-	gtk_list_store_append(GTK_LIST_STORE(list_store2),&iter2);
+	GTK2.TreeModel list_store2 = self->get_model();
+	GTK2.TreeIter iter2 = list_store2->append();
 
 	/* Copy the pointer we received into a new struct */
-	struct DATA *temp = NULL;
-	const guchar *my_data = gtk_selection_data_get_data (sdata);
-	memcpy (&temp, my_data, sizeof (temp));
+	array temp = Standards.JSON.decode(sdata->get_text());
 
 	/* Add the received data to the treeview model */
-	gtk_list_store_set(GTK_LIST_STORE(list_store2),&iter2,
-		ROW_COL,temp->row,
-		ITEM_COL,temp->item,
-		QTY_COL,temp->qty,
-		PRICE_COL,temp->price,-1);
-
-	/* We dont need this anymore */
-	free_DATA(temp);
-	#endif
+	list_store2->set_row(iter2, temp);
 }
 
 /* User callback just to see which row was selected, doesnt affect DnD. 
    However it might be important to note that this signal and drag-data-received may occur at the same time. If you drag a row out of one view, your selection changes too */
 void on_selection_changed(object self) {
-	#if 0
+	[GTK2.TreeIter iter, GTK2.TreeModel list_store] = self->get_selected();
 	/* "changed" signal sometimes fires blanks, so make sure we actually 
 	 have a selection/
 http://library.gnome.org/devel/gtk/stable/GtkTreeSelection.html#GtkTreeSelection-changed */
-	if (rv==FALSE){
-		printf("No row selected\n");
+	if (!iter) {
+		write("No row selected\n");
 		return;
 	}
-	#endif
-	[GTK2.TreeIter iter, GTK2.TreeModel list_store] = self->get_selected();
 	write("on_selection_changed: ");
 	print_DATA(list_store->get_row(iter));
 }
