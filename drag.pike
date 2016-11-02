@@ -33,7 +33,7 @@ void print_DATA(array data){
 }
 
 /* User callback for "get"ing the data out of the row that was DnD'd */
-mixed on_drag_data_get(object self, mixed drag_context,
+mixed on_drag_data_get(GTK2.Widget self, GDK2.DragContext drag_context,
 			GTK2.SelectionData sdata, int info, int time) {
 	write("on_drag_data_get: self %O, dc %O, sd %O\n", self, drag_context, sdata);
 
@@ -46,9 +46,9 @@ mixed on_drag_data_get(object self, mixed drag_context,
 }
 
 /* User callback for putting the data into the other treeview */
-void on_drag_data_received(object self, mixed drag_context,
+void on_drag_data_received(GTK2.Widget self, GDK2.DragContext drag_context,
 			int x, int y, GTK2.SelectionData sdata, int info,
-			int time, GTK2.TreeView user_data){
+			int time, GTK2.TreeView user_data) {
 	write("on_drag_data_received:\n");
 
 	/* Remove row from the source treeview */
