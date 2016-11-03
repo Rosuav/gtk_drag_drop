@@ -48,11 +48,14 @@ mixed on_drag_data_get(GTK2.Widget self, GDK2.DragContext drag_context,
 /* User callback for putting the data into the other treeview */
 void on_drag_data_received(GTK2.Widget self, GDK2.DragContext drag_context,
 			int x, int y, GTK2.SelectionData sdata, int info,
-			int time, GTK2.TreeView user_data) {
+			int time) {
 	write("on_drag_data_received:\n");
 
+	//Variation from the C version: ask what the source widget is, don't hard-code it!
+	GTK2.Widget source = drag_context->get_source_widget();
+
 	/* Remove row from the source treeview */
-	[GTK2.TreeIter iter, GTK2.TreeModel list_store] = user_data->get_selection()->get_selected();
+	[GTK2.TreeIter iter, GTK2.TreeModel list_store] = source->get_selection()->get_selected();
 	list_store->remove(iter);
 
 	/* Now add to the other treeview */
@@ -138,7 +141,7 @@ int main(int argc, array(string) argv){
 	view2->drag_dest_set(GTK2.DEST_DEFAULT_ALL,drag_targets,
 		GTK2.GDK_ACTION_COPY|GTK2.GDK_ACTION_MOVE); 
 	/* Attach a "drag-data-received" signal to pull in the dragged data */
-	view2->signal_connect("drag-data-received", on_drag_data_received, view1);
+	view2->signal_connect("drag-data-received", on_drag_data_received);
 
 	/* Rock'n Roll */
 	return -1;
