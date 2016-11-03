@@ -20,7 +20,7 @@ array row2_data = ({
 });
 
 constant drag_targets = ({
-	({"STRING", GTK2.TARGET_SAME_APP, 0}),
+	({"text/plain", GTK2.TARGET_SAME_APP, 0}),
 });
 
 /* Convenience function to print out the contents of a DATA struct onto stdout */
